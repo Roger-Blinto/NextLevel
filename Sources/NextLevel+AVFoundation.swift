@@ -118,7 +118,7 @@ extension AVCaptureDevice {
 	///   - position: Desired position of the device
 	///   - prioritizedDeviceTypes: Device types of interest, in descending order
 	/// - Returns: Primary video capture device found, otherwise nil
-	public class func primaryVideoDevice(forPosition position: AVCaptureDevice.Position, prioritizedDeviceTypes: [AVCaptureDevice.DeviceType] = [/* .builtInTripleCamera,*/ .builtInDualCamera, .builtInWideAngleCamera]) -> AVCaptureDevice? {
+	public class func primaryVideoDevice(forPosition position: AVCaptureDevice.Position, prioritizedDeviceTypes: [AVCaptureDevice.DeviceType] = [.builtInTripleCamera, .builtInDualCamera, .builtInWideAngleCamera]) -> AVCaptureDevice? {
 		AVCaptureDevice.DiscoverySession(deviceTypes: prioritizedDeviceTypes, mediaType: AVMediaType.video, position: position).devices.first
 	}
 
