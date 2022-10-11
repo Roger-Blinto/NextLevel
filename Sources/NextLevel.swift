@@ -81,23 +81,11 @@ public enum NextLevelDeviceType: Int, CustomStringConvertible {
             return AVCaptureDevice.DeviceType.builtInTrueDepthCamera
             #endif
         case .dualWideCamera:
-            if #available(iOS 13.0, *) {
-                return AVCaptureDevice.DeviceType.builtInDualWideCamera
-            } else {
-                return AVCaptureDevice.DeviceType(rawValue: "Unavailable")
-            }
+            return AVCaptureDevice.DeviceType.builtInDualWideCamera
         case .ultraWideAngleCamera:
-            if #available(iOS 13.0, *) {
-                return AVCaptureDevice.DeviceType.builtInUltraWideCamera
-            } else {
-                return AVCaptureDevice.DeviceType(rawValue: "Unavailable")
-            }
+            return AVCaptureDevice.DeviceType.builtInUltraWideCamera
         case .tripleCamera:
-            if #available(iOS 13.0, *) {
-                return AVCaptureDevice.DeviceType.builtInTripleCamera
-            } else {
-                return AVCaptureDevice.DeviceType(rawValue: "Unavailable")
-            }
+            return AVCaptureDevice.DeviceType.builtInTripleCamera
         }
     }
 
@@ -385,7 +373,6 @@ public class NextLevel: NSObject {
                 }
                 return false
             }
-
 
         }
     }
@@ -2235,17 +2222,17 @@ extension NextLevel {
 
         }
     }
-    
+
     /// Changes the current device frame rate to the highest frame rate supported by the device
     public func configureDeviceForHighestFrameRate() {
         self.executeClosureAsyncOnSessionQueueIfNecessary {
             guard let device = self._currentDevice else {
                 return
             }
-            
+
             var bestFormat: AVCaptureDevice.Format?
             var bestFrameRateRange: AVFrameRateRange?
-            
+
             for format in device.formats {
                for range in format.videoSupportedFrameRateRanges {
                    if range.maxFrameRate > bestFrameRateRange?.maxFrameRate ?? 0 {
@@ -2254,20 +2241,20 @@ extension NextLevel {
                    }
                }
             }
-            
+
             if let bestFormat = bestFormat,
                let bestFrameRateRange = bestFrameRateRange {
                 do {
                     try device.lockForConfiguration()
-                    
+
                     // Set the device's active format.
                     device.activeFormat = bestFormat
-                    
+
                     // Set the device's min/max frame duration.
                     let duration = bestFrameRateRange.minFrameDuration
                     device.activeVideoMinFrameDuration = duration
                     device.activeVideoMaxFrameDuration = duration
-                    
+
                     device.unlockForConfiguration()
                 } catch {
                     // Handle error.
@@ -2276,7 +2263,7 @@ extension NextLevel {
             }
         }
     }
-    
+
 }
 
 // MARK: - video capture
@@ -2289,11 +2276,13 @@ extension NextLevel {
             var deviceTypes: [AVCaptureDevice.DeviceType] = [.builtInWideAngleCamera,
                                                              .builtInTelephotoCamera,
                                                              .builtInDualCamera,
-                                                             .builtInTrueDepthCamera]
-            if #available(iOS 13.0, *) {
-                deviceTypes.append(contentsOf: [.builtInUltraWideCamera, .builtInDualWideCamera, .builtInTripleCamera])
-            }
-
+                                                             .builtInTrueDepthCamera,
+                                                             .builtInUltraWideCamera,
+                                                             .builtInDualWideCamera,
+                                                             .builtInTripleCamera]
+//            if #available(iOS 15.4, *) {
+//                deviceTypes.append(contentsOf: [.builtInLiDARDepthCamera])
+//            }
             let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes, mediaType: AVMediaType.video, position: .unspecified)
             return discoverySession.devices.count > 0
         }
