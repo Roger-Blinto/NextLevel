@@ -323,7 +323,7 @@ public class NextLevel: NSObject {
     public var photoStabilizationEnabled: Bool = false
 
     /// Video stabilization mode
-    public var videoStabilizationMode: NextLevelVideoStabilizationMode = .off {
+    public var videoStabilizationMode: NextLevelVideoStabilizationMode = .auto {
         didSet {
             self.executeClosureAsyncOnSessionQueueIfNecessary {
                 self.beginConfiguration()
