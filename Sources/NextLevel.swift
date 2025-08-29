@@ -310,16 +310,16 @@ public class NextLevel: NSObject {
     /// The current orientation of the device.
     public var deviceOrientation: NextLevelDeviceOrientation = .portrait {
         didSet {
-			assert(Thread.isMainThread)
-
             automaticallyUpdatesDeviceOrientation = false
 
             guard deviceOrientation != oldValue else { return }
 
-			deviceDelegate?.nextLevelDeviceOrientationWillChange(self)
+            DispatchQueue.main.async {
+                self.deviceDelegate?.nextLevelDeviceOrientationWillChange(self)
+            }
 
 			_sessionQueue.sync {
-				updateVideoOrientation(deviceOrientation)
+				updateVideoOrientation()
 			}
         }
     }
@@ -1335,7 +1335,7 @@ extension NextLevel {
         }
     }
 
-	internal func updateVideoOrientation(_ deviceOrientation: AVCaptureVideoOrientation? = nil) {
+    internal func updateVideoOrientation() {
         if let session = self._recordingSession {
             if session.currentClipHasAudio == false && session.currentClipHasVideo == false {
                 session.reset()
@@ -1343,7 +1343,7 @@ extension NextLevel {
         }
 
         var didChangeOrientation = false
-		let currentOrientation = deviceOrientation ?? self.deviceOrientation
+		let currentOrientation = self.deviceDelegate?.nextLevelCurrentDeviceOrientation?() ?? AVCaptureVideoOrientation.avorientationFromUIDeviceOrientation(UIDevice.current.orientation)
 
         if let videoOutput = self._videoOutput, let videoConnection = videoOutput.connection(with: AVMediaType.video) {
             if videoConnection.isVideoOrientationSupported && videoConnection.videoOrientation != currentOrientation {
