@@ -1345,13 +1345,6 @@ extension NextLevel {
         var didChangeOrientation = false
 		let currentOrientation = deviceOrientation ?? self.deviceOrientation
 
-        if let previewConnection = self.previewLayer.connection {
-            if previewConnection.isVideoOrientationSupported && previewConnection.videoOrientation != currentOrientation {
-                previewConnection.videoOrientation = currentOrientation
-                didChangeOrientation = true
-            }
-        }
-
         if let videoOutput = self._videoOutput, let videoConnection = videoOutput.connection(with: AVMediaType.video) {
             if videoConnection.isVideoOrientationSupported && videoConnection.videoOrientation != currentOrientation {
                 videoConnection.videoOrientation = currentOrientation
@@ -1366,9 +1359,18 @@ extension NextLevel {
             }
         }
 
-        if didChangeOrientation == true {
-            self.deviceDelegate?.nextLevel(self, didChangeDeviceOrientation: currentOrientation)
-        }
+		DispatchQueue.main.async {
+			if let previewConnection = self.previewLayer.connection {
+				if previewConnection.isVideoOrientationSupported && previewConnection.videoOrientation != currentOrientation {
+					previewConnection.videoOrientation = currentOrientation
+					didChangeOrientation = true
+				}
+			}
+
+			if didChangeOrientation == true {
+				self.deviceDelegate?.nextLevel(self, didChangeDeviceOrientation: currentOrientation)
+			}
+		}
     }
 
     internal func updateVideoOutputSettings() {
